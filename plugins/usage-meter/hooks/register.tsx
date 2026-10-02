@@ -6,9 +6,23 @@ import type { Limit, Usage } from '../types'
 const usageAtom = atom({ plugin: 'usage-meter', key: 'usage' } as const, null)
 const nowAtom = atom({ plugin: 'usage-meter', key: 'now' } as const, 0)
 
-const BAR_CELLS = 12
 const LABELS: Record<string, string> = { five_hour: 'Session', seven_day: 'Weekly', spend_limit: 'Spend' }
+const SHORT_LABELS: Record<string, string> = { five_hour: '5h', seven_day: '7d', spend_limit: '$' }
 const ORDER = ['five_hour', 'seven_day', 'spend_limit']
+const FOOTER_LEFT_RESERVE = 62
+const PERCENT_WIDTH = 4
+
+type Layout = { isShortLabel: boolean; barCells: number; hasDetail: boolean; gap: number }
+type Segment = { key: string; label: string; shortLabel: string; percent: number; detail: string | undefined }
+
+const FULL_LAYOUT: Layout = { isShortLabel: false, barCells: 12, hasDetail: true, gap: 3 }
+const MINIMAL_LAYOUT: Layout = { isShortLabel: true, barCells: 0, hasDetail: false, gap: 2 }
+const LAYOUTS: Layout[] = [
+  FULL_LAYOUT,
+  { isShortLabel: false, barCells: 12, hasDetail: false, gap: 3 },
+  { isShortLabel: true, barCells: 8, hasDetail: false, gap: 2 },
+  MINIMAL_LAYOUT,
+]
 
 function toUsage(context: SessionContextUsage, rateLimits: readonly SessionRateLimit[]): Usage {
   return {
@@ -19,10 +33,10 @@ function toUsage(context: SessionContextUsage, rateLimits: readonly SessionRateL
   }
 }
 
-function filledCells(percent: number): number {
+function filledCells(percent: number, cells: number): number {
   if (percent <= 0) return 0
-  if (percent >= 100) return BAR_CELLS
-  return Math.min(BAR_CELLS - 1, Math.max(1, Math.round((percent / 100) * BAR_CELLS)))
+  if (percent >= 100) return cells
+  return Math.min(cells - 1, Math.max(1, Math.round((percent / 100) * cells)))
 }
 
 function fillColor(percent: number): string {
@@ -48,6 +62,26 @@ function formatReset(resetsAt: string | undefined, now: number): string | undefi
   if (days > 0) return `${days}d ${hours}h`
   if (hours > 0) return `${hours}h ${mins}m`
   return `${mins}m`
+}
+
+function segmentWidth(segment: Segment, layout: Layout): number {
+  const label = layout.isShortLabel ? segment.shortLabel : segment.label
+  const bar = layout.barCells > 0 ? layout.barCells + 1 : 0
+  const detail = layout.hasDetail && segment.detail ? segment.detail.length + 1 : 0
+  return label.length + 1 + bar + PERCENT_WIDTH + detail
+}
+
+function pickLayout(segments: Segment[], prefix: string, columns: number | undefined): Layout {
+  if (columns === undefined) return FULL_LAYOUT
+  const room = columns - FOOTER_LEFT_RESERVE
+  return (
+    LAYOUTS.find(layout => {
+      const parts = segments.map(segment => segmentWidth(segment, layout))
+      if (prefix) parts.push(prefix.length)
+      const width = parts.reduce((sum, part) => sum + part, 0) + layout.gap * (parts.length - 1)
+      return width <= room
+    }) ?? MINIMAL_LAYOUT
+  )
 }
 
 function sortLimits(limits: readonly Limit[]): Limit[] {
@@ -84,43 +118,53 @@ export const register: Register = on => {
     const now = await read($, nowAtom)
     const { Box, Text } = $.ui.resolve(e)
 
-    const meter = (key: string, label: string, percent: number, detail: string | undefined) => {
-      const filled = filledCells(percent)
-      const color = fillColor(percent)
-      const isAlarming = percent >= 70
+    const segments: Segment[] = [
+      {
+        key: 'ctx',
+        label: 'Context',
+        shortLabel: 'ctx',
+        percent: usage.contextPercent ?? 0,
+        detail: `${formatTokens(usage.contextTokens ?? 0)}/${formatTokens(usage.contextWindow)}`,
+      },
+      ...sortLimits(usage.limits).map(limit => {
+        const reset = formatReset(limit.resetsAt, now)
+        return {
+          key: `limit-${limit.kind}`,
+          label: LABELS[limit.kind] ?? limit.kind,
+          shortLabel: SHORT_LABELS[limit.kind] ?? limit.kind,
+          percent: limit.percentUsed,
+          detail: reset ? `↻ ${reset}` : undefined,
+        }
+      }),
+    ]
+    const prefix = e.props.modes.join(' & ')
+    const layout = pickLayout(segments, prefix, e.viewport?.columns)
+
+    const meter = (segment: Segment) => {
+      const filled = filledCells(segment.percent, layout.barCells)
+      const color = fillColor(segment.percent)
+      const isAlarming = segment.percent >= 70
       return (
-        <Box key={key} flexDirection="row" gap={1}>
-          <Text dimColor>{label}</Text>
-          <Box flexDirection="row">
-            <Text color={color}>{'█'.repeat(filled)}</Text>
-            <Text dimColor>{'█'.repeat(BAR_CELLS - filled)}</Text>
-          </Box>
+        <Box key={segment.key} flexDirection="row" gap={1}>
+          <Text dimColor>{layout.isShortLabel ? segment.shortLabel : segment.label}</Text>
+          {layout.barCells > 0 ? (
+            <Box flexDirection="row">
+              <Text color={color}>{'█'.repeat(filled)}</Text>
+              <Text dimColor>{'█'.repeat(layout.barCells - filled)}</Text>
+            </Box>
+          ) : null}
           <Text bold={isAlarming} color={isAlarming ? color : undefined}>
-            {`${Math.round(percent)}%`.padStart(4)}
+            {`${Math.round(segment.percent)}%`.padStart(PERCENT_WIDTH)}
           </Text>
-          {detail ? <Text dimColor>{detail}</Text> : null}
+          {layout.hasDetail && segment.detail ? <Text dimColor>{segment.detail}</Text> : null}
         </Box>
       )
     }
 
-    const contextDetail = `${formatTokens(usage.contextTokens ?? 0)}/${formatTokens(usage.contextWindow)}`
-    const meters = [
-      meter('ctx', 'Context', usage.contextPercent ?? 0, contextDetail),
-      ...sortLimits(usage.limits).map(limit => {
-        const reset = formatReset(limit.resetsAt, now)
-        return meter(
-          `limit-${limit.kind}`,
-          LABELS[limit.kind] ?? limit.kind,
-          limit.percentUsed,
-          reset ? `↻ ${reset}` : undefined,
-        )
-      }),
-    ]
-
     return (
-      <Box flexDirection="row" gap={3}>
-        {e.props.modes.length > 0 ? <Text dimColor>{e.props.modes.join(' & ')}</Text> : null}
-        {meters}
+      <Box flexDirection="row" gap={layout.gap}>
+        {prefix ? <Text dimColor>{prefix}</Text> : null}
+        {segments.map(meter)}
       </Box>
     )
   })
