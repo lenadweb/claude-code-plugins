@@ -19,7 +19,6 @@ function toUsage(context: SessionContextUsage, rateLimits: readonly SessionRateL
   }
 }
 
-// Cells filled for a percentage: any usage shows at least one, and only 100% fills the bar.
 function filledCells(percent: number): number {
   if (percent <= 0) return 0
   if (percent >= 100) return BAR_CELLS
@@ -64,7 +63,6 @@ export const register: Register = on => {
     const now = await $.clock.now()
     await update($, nowAtom, () => now)
 
-    // Keeps the "resets in" countdowns fresh between measurements.
     $.clock.every(60_000, () => {
       void $.clock.now().then(t => update($, nowAtom, () => t))
     })
