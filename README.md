@@ -5,7 +5,7 @@ Personal [Claude Code mods](https://code.claude.com/docs/en/plugins/mods/overvie
 | Mod | What it does |
 | --- | --- |
 | **[usage-meter](plugins/usage-meter)** | Progress bars at the bottom right of the prompt footer, as in the desktop app: **context** window fill, **session** (5-hour) and **weekly** plan limits with time until reset. Bars are blue, turn amber past 70% and red past 90%. |
-| **[image-preview](plugins/image-preview)** | When the clipboard holds an image, shows its preview above the prompt with its size and format. After you paste, each `[Image #N]` in the draft gets a thumbnail until you send the prompt. **↗ Open** opens the image in Preview. Ghostty and kitty get the real pixels; other terminals, Terminal.app included, get a quadrant-block rendering at twice the horizontal detail of half blocks. |
+| **[image-preview](plugins/image-preview)** | When the clipboard holds an image, shows its preview above the prompt with its size and format. After you paste, each `[Image #N]` in the draft gets a thumbnail until you send the prompt. **↗ Open** opens the image in Preview. Previews size themselves to the terminal. Ghostty and kitty get the real pixels; other terminals, Terminal.app included, get block characters picked per cell from quadrants, halves and eighths, with colours dithered to the 256-colour palette where the terminal has no true colour. If [chafa](https://hpjansson.org/chafa/) is installed, it draws them instead. |
 
 Each mod is a standalone plugin under [`plugins/`](plugins) and can be installed on its own.
 
