@@ -1,6 +1,6 @@
-# image-preview
+# lenadweb-image-preview
 
-See the image you are about to paste into Claude Code before you paste it. When the clipboard holds an image, image-preview draws a preview above the prompt with its size and format. After you paste, every `[Image #N]` in your draft gets a thumbnail until you send the prompt, so you always know which image is which.
+See the image you are about to paste into Claude Code before you paste it. When the clipboard holds an image, lenadweb-image-preview draws a preview above the prompt with its size and format. After you paste, every `[Image #N]` in your draft gets a thumbnail until you send the prompt, so you always know which image is which.
 
 ![A preview of the clipboard image above the Claude Code prompt, with its size, format and Open and Hide buttons](docs/screenshot.png)
 

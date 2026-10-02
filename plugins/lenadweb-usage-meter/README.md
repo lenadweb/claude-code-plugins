@@ -1,6 +1,6 @@
-# usage-meter
+# lenadweb-usage-meter
 
-See how much of your context window and plan limits you have used without leaving the Claude Code terminal. usage-meter draws three progress bars at the bottom right of the prompt footer, the same figures the Claude desktop app shows in its usage popover.
+See how much of your context window and plan limits you have used without leaving the Claude Code terminal. lenadweb-usage-meter draws three progress bars at the bottom right of the prompt footer, the same figures the Claude desktop app shows in its usage popover.
 
 ![Context, session and weekly usage bars at the bottom right of the Claude Code prompt footer](docs/screenshot.png)
 
@@ -20,7 +20,7 @@ Session and weekly limits appear after the first reply of a session, because Cla
 
 ## What it runs and reads
 
-usage-meter reads the usage figures Claude Code already has for the session and draws them. It runs no programs, makes no network requests, reads no files and stores nothing outside the session.
+lenadweb-usage-meter reads the usage figures Claude Code already has for the session and draws them. It runs no programs, makes no network requests, reads no files and stores nothing outside the session.
 
 ## License
 

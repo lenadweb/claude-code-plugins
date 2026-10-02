@@ -14,9 +14,9 @@ import { DEFAULT_BAND, fitImage, isSameSize, previewArea, thumbnailArea } from '
 import type { CellBox } from './sizing'
 import { canShowPixels, hasTrueColor } from './terminal'
 
-const clipboardAtom = atom({ plugin: 'image-preview', key: 'clipboard' } as const, null)
-const hiddenChangeCountAtom = atom({ plugin: 'image-preview', key: 'hiddenChangeCount' } as const, -1)
-const thumbnailsAtom = atom({ plugin: 'image-preview', key: 'thumbnails' } as const, {})
+const clipboardAtom = atom({ plugin: 'lenadweb-image-preview', key: 'clipboard' } as const, null)
+const hiddenChangeCountAtom = atom({ plugin: 'lenadweb-image-preview', key: 'hiddenChangeCount' } as const, -1)
+const thumbnailsAtom = atom({ plugin: 'lenadweb-image-preview', key: 'thumbnails' } as const, {})
 
 const POLL_INTERVAL_MS = 1500
 const TEMP_DIR_PREFIX = 'claude-image-preview'

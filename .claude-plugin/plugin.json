@@ -1,7 +1,0 @@
-{
-  "name": "usage-meter",
-  "version": "0.1.0",
-  "description": "Context window, session and weekly plan usage at the bottom right of the CLI prompt footer",
-  "author": { "name": "user", "email": "lenadweber@gmail.com" },
-  "types": "./types/index.d.ts"
-}

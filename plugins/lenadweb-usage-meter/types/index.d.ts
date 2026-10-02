@@ -9,6 +9,6 @@ export type Usage = {
 
 declare module 'claude-code' {
   interface PluginState {
-    'usage-meter': { usage: Usage | null; now: number }
+    'lenadweb-usage-meter': { usage: Usage | null; now: number }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "image-preview",
+  "name": "lenadweb-image-preview",
   "version": "0.1.0",
   "description": "Previews the image in the clipboard and the images pasted into the prompt, drawn above the prompt in any terminal",
   "author": { "name": "lenadweb", "url": "https://github.com/lenadweb" },

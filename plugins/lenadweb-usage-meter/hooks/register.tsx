@@ -5,8 +5,8 @@ import { renderFooter } from './footer'
 import { pickLayout } from './layout'
 import { buildSegments, toUsage } from './usage'
 
-const usageAtom = atom({ plugin: 'usage-meter', key: 'usage' } as const, null)
-const nowAtom = atom({ plugin: 'usage-meter', key: 'now' } as const, 0)
+const usageAtom = atom({ plugin: 'lenadweb-usage-meter', key: 'usage' } as const, null)
+const nowAtom = atom({ plugin: 'lenadweb-usage-meter', key: 'now' } as const, 0)
 
 const CLOCK_TICK_MS = 60_000
 

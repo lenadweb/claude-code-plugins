@@ -11,7 +11,7 @@ export type Picture = {
 
 declare module 'claude-code' {
   interface PluginState {
-    'image-preview': {
+    'lenadweb-image-preview': {
       clipboard: Picture | null
       hiddenChangeCount: number
       thumbnails: Record<string, Picture>

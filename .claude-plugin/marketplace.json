@@ -9,13 +9,13 @@
   },
   "plugins": [
     {
-      "name": "usage-meter",
-      "source": "./plugins/usage-meter",
+      "name": "lenadweb-usage-meter",
+      "source": "./plugins/lenadweb-usage-meter",
       "description": "Context, session and weekly usage bars at the bottom right of the prompt footer, like the desktop app"
     },
     {
-      "name": "image-preview",
-      "source": "./plugins/image-preview",
+      "name": "lenadweb-image-preview",
+      "source": "./plugins/lenadweb-image-preview",
       "description": "A preview of the image in the clipboard and thumbnails of the images pasted into the prompt, drawn above the prompt in any terminal"
     }
   ]
