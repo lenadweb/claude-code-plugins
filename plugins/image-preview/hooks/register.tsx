@@ -15,8 +15,6 @@ const SUB_X = 4
 const SUB_Y = 8
 const SUBPIXELS = SUB_X * SUB_Y
 const FLAT_CELL_ERROR = 9600
-const DITHER_STRENGTH = 0.75
-const DITHER_MIN_ERROR = 12
 const MAX_PREVIEW_ROWS = 30
 const MAX_THUMB = { columns: 48, rows: 12 }
 const FALLBACK_BAND = { columns: 80, rows: 24 }
@@ -84,23 +82,6 @@ const SYSTEM_COLORS: Rgb[] = [
 function xtermColor(index: number): Rgb {
   if (index < 16) return SYSTEM_COLORS[index] ?? [0, 0, 0]
   return PALETTE[index - 16] ?? [0, 0, 0]
-}
-
-function nearestPaletteColor([r, g, b]: Rgb): Rgb {
-  let best: Rgb = [0, 0, 0]
-  let bestDistance = Infinity
-  for (const color of PALETTE) {
-    const mean = (r + color[0]) / 2
-    const dr = r - color[0]
-    const dg = g - color[1]
-    const db = b - color[2]
-    const distance = (2 + mean / 256) * dr * dr + 4 * dg * dg + (2 + (255 - mean) / 256) * db * db
-    if (distance < bestDistance) {
-      bestDistance = distance
-      best = color
-    }
-  }
-  return best
 }
 
 function packColor([r, g, b]: Rgb): number {
@@ -193,55 +174,27 @@ function splitCell(sub: Float32Array): { code: number; fg: Rgb; bg: Rgb } {
   return best
 }
 
-function renderCells(image: { width: number; height: number; pixels: Float32Array }, isPalette: boolean): Box & { cells: string } {
+function renderCells(image: { width: number; height: number; pixels: Float32Array }): Box & { cells: string } {
   const columns = Math.floor(image.width / SUB_X)
   const rows = Math.floor(image.height / SUB_Y)
   const words = new Uint32Array(columns * rows * 3)
-  const carry = new Float32Array((columns + 2) * (rows + 1) * 3)
   const sub = new Float32Array(SUBPIXELS * 3)
-  const carryAt = (x: number, y: number) => (y * (columns + 2) + x + 1) * 3
 
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < columns; x++) {
-      const k = carryAt(x, y)
       for (let sy = 0; sy < SUB_Y; sy++) {
         for (let sx = 0; sx < SUB_X; sx++) {
           const from = ((y * SUB_Y + sy) * image.width + x * SUB_X + sx) * 3
           const to = (sy * SUB_X + sx) * 3
-          for (let c = 0; c < 3; c++) sub[to + c] = Math.max(0, Math.min(255, (image.pixels[from + c] ?? 0) + (carry[k + c] ?? 0)))
+          for (let c = 0; c < 3; c++) sub[to + c] = image.pixels[from + c] ?? 0
         }
       }
 
       const cell = splitCell(sub)
-      const fg = isPalette ? nearestPaletteColor(cell.fg) : cell.fg
-      const bg = isPalette ? nearestPaletteColor(cell.bg) : cell.bg
       const i = (y * columns + x) * 3
       words[i] = cell.code
-      words[i + 1] = packColor(fg)
-      words[i + 2] = packColor(bg)
-
-      if (!isPalette) continue
-      const glyphMask = GLYPHS.find(g => g.code === cell.code)?.mask
-      let er = 0
-      let eg = 0
-      let eb = 0
-      for (let p = 0; p < SUBPIXELS; p++) {
-        const [r, g, b] = !glyphMask || glyphMask[p] ? fg : bg
-        er += ((channel(sub, p, 0) - r) * DITHER_STRENGTH) / SUBPIXELS
-        eg += ((channel(sub, p, 1) - g) * DITHER_STRENGTH) / SUBPIXELS
-        eb += ((channel(sub, p, 2) - b) * DITHER_STRENGTH) / SUBPIXELS
-      }
-      const spread = (dx: number, dy: number, weight: number) => {
-        const at = carryAt(x + dx, y + dy)
-        carry[at] = (carry[at] ?? 0) + er * weight
-        carry[at + 1] = (carry[at + 1] ?? 0) + eg * weight
-        carry[at + 2] = (carry[at + 2] ?? 0) + eb * weight
-      }
-      if (Math.abs(er) + Math.abs(eg) + Math.abs(eb) < DITHER_MIN_ERROR * DITHER_STRENGTH) continue
-      spread(1, 0, 7 / 16)
-      spread(-1, 1, 3 / 16)
-      spread(0, 1, 5 / 16)
-      spread(1, 1, 1 / 16)
+      words[i + 1] = packColor(cell.fg)
+      words[i + 2] = packColor(cell.bg)
     }
   }
   return { columns, rows, cells: encodeCells(words) }
@@ -316,7 +269,7 @@ function fit(width: number, height: number, box: Box): Box {
 function previewBox(band: Box): Box {
   return {
     columns: Math.max(16, band.columns - 4),
-    rows: Math.max(6, Math.min(MAX_PREVIEW_ROWS, Math.floor(band.rows / 2) - 3)),
+    rows: Math.max(6, Math.min(MAX_PREVIEW_ROWS, Math.floor(band.rows * 0.6) - 3)),
   }
 }
 
@@ -368,7 +321,7 @@ async function renderPicture($: EngineInterface, from: Picture, box: Box): Promi
   ])
   if (converted.exitCode !== 0) return null
   const { base64 } = await $.fs.read(out, { as: 'bytes' })
-  return { ...sized, ...renderCells(readBmp(decodeBase64(base64)), isPalette) }
+  return { ...sized, ...renderCells(readBmp(decodeBase64(base64))) }
 }
 
 async function readClipboard($: EngineInterface): Promise<void> {
