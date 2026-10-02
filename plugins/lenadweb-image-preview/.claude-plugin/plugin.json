@@ -12,6 +12,7 @@
   "homepage": "https://github.com/lenadweb/claude-code-plugins/tree/main/plugins/lenadweb-image-preview",
   "documentationUrl": "https://github.com/lenadweb/claude-code-plugins/tree/main/plugins/lenadweb-image-preview#readme",
   "supportUrl": "https://github.com/lenadweb/claude-code-plugins/issues",
+  "privacyPolicyUrl": "https://github.com/lenadweb/claude-code-plugins/blob/main/plugins/lenadweb-image-preview/PRIVACY.md",
   "keywords": [
     "images",
     "clipboard",

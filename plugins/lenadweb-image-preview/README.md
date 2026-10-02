@@ -53,6 +53,10 @@ Nothing. The plugin makes no network requests and sends no data to any server, A
 
 Images are kept only in the temporary folder, which is deleted when the Claude Code session ends.
 
+## Privacy
+
+See the [privacy policy](PRIVACY.md): the plugin reads clipboard images and the prompt draft locally, keeps images only until the session ends and shares nothing.
+
 ## Hooks it adds
 
 | Event | What the hook does |
