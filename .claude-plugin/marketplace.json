@@ -1,0 +1,17 @@
+{
+  "name": "lenadweb-mods",
+  "owner": {
+    "name": "lenadweb",
+    "url": "https://github.com/lenadweb"
+  },
+  "metadata": {
+    "description": "Personal Claude Code mods: usage meters and other HUD tweaks for the terminal"
+  },
+  "plugins": [
+    {
+      "name": "usage-meter",
+      "source": "./plugins/usage-meter",
+      "description": "Context, session and weekly usage bars at the bottom right of the prompt footer, like the desktop app"
+    }
+  ]
+}
