@@ -19,6 +19,7 @@ const hiddenChangeCountAtom = atom({ plugin: 'image-preview', key: 'hiddenChange
 const thumbnailsAtom = atom({ plugin: 'image-preview', key: 'thumbnails' } as const, {})
 
 const POLL_INTERVAL_MS = 1500
+const TEMP_DIR_PREFIX = 'claude-image-preview'
 const TOOL_PATH = '/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin'
 
 const session = {
@@ -180,11 +181,19 @@ async function openInViewer($: EngineInterface, picture: Picture): Promise<void>
   await $.process.run(['open', picture.file])
 }
 
+async function removeTempFiles($: EngineInterface): Promise<void> {
+  if (!session.workDir.includes(TEMP_DIR_PREFIX)) {
+    return
+  }
+  await $.process.run(['rm', '-rf', session.workDir])
+  session.workDir = ''
+}
+
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     const result = await next(e)
 
-    const tempDir = await $.process.run(['mktemp', '-d', '-t', 'claude-image-preview'])
+    const tempDir = await $.process.run(['mktemp', '-d', '-t', TEMP_DIR_PREFIX])
     session.workDir = tempDir.stdout.trim()
     await detectTerminal($)
     await poll($)
@@ -202,6 +211,11 @@ export const register: Register = on => {
       void poll($)
     }
     return result
+  })
+
+  on('session.end', async ($, e, next) => {
+    await removeTempFiles($)
+    return next(e)
   })
 
   on('prompt.submit', async ($, e, next) => {

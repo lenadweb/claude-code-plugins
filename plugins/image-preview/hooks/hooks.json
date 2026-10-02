@@ -1,1 +1,4 @@
-{ "modules": ["./register.tsx"] }
+{
+  "hooks": {},
+  "modules": ["./register.tsx"]
+}

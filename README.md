@@ -9,11 +9,11 @@ Personal [Claude Code mods](https://code.claude.com/docs/en/plugins/mods/overvie
 
 ### usage-meter
 
-![Context, session and weekly usage bars at the bottom right of the Claude Code prompt footer](docs/usage-meter.png)
+![Context, session and weekly usage bars at the bottom right of the Claude Code prompt footer](plugins/usage-meter/docs/screenshot.png)
 
 ### image-preview
 
-![A preview of the clipboard image above the Claude Code prompt, with its size, format and Open and Hide buttons](docs/image-preview.png)
+![A preview of the clipboard image above the Claude Code prompt, with its size, format and Open and Hide buttons](plugins/image-preview/docs/screenshot.png)
 
 Each mod is a standalone plugin under [`plugins/`](plugins) and can be installed on its own.
 
