@@ -1,6 +1,6 @@
-# lenadweb-mods
+# claude-code-plugins
 
-Personal [Claude Code mods](https://code.claude.com/docs/en/plugins/mods/overview): small HUD tweaks for the terminal, packaged as one plugin marketplace.
+Personal [Claude Code mods](https://code.claude.com/docs/en/plugins/mods/overview): small HUD tweaks for the terminal, packaged as one plugin marketplace named `lenadweb-mods`.
 
 | Mod | What it does |
 | --- | --- |
@@ -13,7 +13,7 @@ Each mod is a standalone plugin under [`plugins/`](plugins) and can be installed
 Requires Claude Code 2.1.287 or later.
 
 ```sh
-claude plugin marketplace add lenadweb/lenadweb-mods
+claude plugin marketplace add lenadweb/claude-code-plugins
 claude plugin install usage-meter@lenadweb-mods
 ```
 
