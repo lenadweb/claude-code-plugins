@@ -1,8 +1,8 @@
 export type Picture = {
-  id: number
+  changeCount: number
   width: number
   height: number
-  type: string
+  format: string
   file: string
   columns: number
   rows: number
@@ -13,8 +13,8 @@ declare module 'claude-code' {
   interface PluginState {
     'image-preview': {
       clipboard: Picture | null
-      hiddenId: number
-      attached: Record<string, Picture>
+      hiddenChangeCount: number
+      thumbnails: Record<string, Picture>
     }
   }
 }
