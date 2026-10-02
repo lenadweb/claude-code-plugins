@@ -2,7 +2,22 @@
   "name": "lenadweb-usage-meter",
   "version": "0.1.0",
   "description": "Context window, session and weekly plan usage as progress bars at the bottom right of the prompt footer",
-  "author": { "name": "lenadweb", "url": "https://github.com/lenadweb" },
+  "author": {
+    "name": "lenadweb",
+    "url": "https://github.com/lenadweb"
+  },
   "license": "MIT",
+  "icon": "./icon.png",
+  "repository": "https://github.com/lenadweb/claude-code-plugins",
+  "homepage": "https://github.com/lenadweb/claude-code-plugins/tree/main/plugins/lenadweb-usage-meter",
+  "documentationUrl": "https://github.com/lenadweb/claude-code-plugins/tree/main/plugins/lenadweb-usage-meter#readme",
+  "supportUrl": "https://github.com/lenadweb/claude-code-plugins/issues",
+  "keywords": [
+    "usage",
+    "rate-limits",
+    "context-window",
+    "statusline",
+    "mod"
+  ],
   "types": "./types/index.d.ts"
 }

@@ -2,7 +2,22 @@
   "name": "lenadweb-image-preview",
   "version": "0.1.0",
   "description": "Previews the image in the clipboard and the images pasted into the prompt, drawn above the prompt in any terminal",
-  "author": { "name": "lenadweb", "url": "https://github.com/lenadweb" },
+  "author": {
+    "name": "lenadweb",
+    "url": "https://github.com/lenadweb"
+  },
   "license": "MIT",
+  "icon": "./icon.png",
+  "repository": "https://github.com/lenadweb/claude-code-plugins",
+  "homepage": "https://github.com/lenadweb/claude-code-plugins/tree/main/plugins/lenadweb-image-preview",
+  "documentationUrl": "https://github.com/lenadweb/claude-code-plugins/tree/main/plugins/lenadweb-image-preview#readme",
+  "supportUrl": "https://github.com/lenadweb/claude-code-plugins/issues",
+  "keywords": [
+    "images",
+    "clipboard",
+    "preview",
+    "terminal",
+    "mod"
+  ],
   "types": "./types/index.d.ts"
 }
