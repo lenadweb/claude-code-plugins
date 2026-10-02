@@ -5,13 +5,18 @@
     "url": "https://github.com/lenadweb"
   },
   "metadata": {
-    "description": "Personal Claude Code mods: usage meters and other HUD tweaks for the terminal"
+    "description": "Personal Claude Code mods: usage meters, image previews and other HUD tweaks for the terminal"
   },
   "plugins": [
     {
       "name": "usage-meter",
       "source": "./plugins/usage-meter",
       "description": "Context, session and weekly usage bars at the bottom right of the prompt footer, like the desktop app"
+    },
+    {
+      "name": "image-preview",
+      "source": "./plugins/image-preview",
+      "description": "A preview of the image in the clipboard and thumbnails of the images pasted into the prompt, drawn above the prompt in any terminal"
     }
   ]
 }
