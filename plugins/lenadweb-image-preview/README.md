@@ -16,7 +16,7 @@ By default the image is drawn with block characters, choosing for each cell the 
 
 ## Requirements
 
-- macOS, because the plugin reads the clipboard through the system pasteboard.
+- macOS, because the plugin reads the clipboard through the system pasteboard. On Windows and Linux the plugin turns itself off when the session starts: it draws nothing and runs nothing else.
 - Claude Code 2.1.287 or later, in a terminal. The plugin is a mod: it only draws inside the Claude Code terminal and does nothing in chat, Cowork or the desktop app, which has image previews of its own.
 
 ## Settings

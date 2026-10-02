@@ -49,6 +49,15 @@ async function drawPicture($: EngineInterface, image: Picture, area: CellBox): P
   return { ...sized, cells: raster.cells }
 }
 
+async function isPasteboardAvailable($: EngineInterface): Promise<boolean> {
+  try {
+    const check = await $.process.run(['osascript', '-l', 'JavaScript', '-e', PASTEBOARD_SCRIPT, 'check'])
+    return check.exitCode === 0
+  } catch {
+    return false
+  }
+}
+
 async function readClipboard($: EngineInterface): Promise<void> {
   const check = await $.process.run(['osascript', '-l', 'JavaScript', '-e', PASTEBOARD_SCRIPT, 'check'])
   const pasteboard = parsePasteboardState(check.stdout)
@@ -167,6 +176,10 @@ export const register: Register = (on, options) => {
 
   on('session.start', async ($, e, next) => {
     const result = await next(e)
+
+    if (!(await isPasteboardAvailable($))) {
+      return result
+    }
 
     const tempDir = await $.process.run(['mktemp', '-d', '-t', 'claude-image-preview'])
     session.workDir = tempDir.stdout.trim()
