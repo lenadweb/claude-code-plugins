@@ -5,7 +5,7 @@ Personal [Claude Code mods](https://code.claude.com/docs/en/plugins/mods/overvie
 | Mod | What it does |
 | --- | --- |
 | **[lenadweb-usage-meter](plugins/lenadweb-usage-meter)** | Progress bars at the bottom right of the prompt footer, as in the desktop app: **context** window fill, **session** (5-hour) and **weekly** plan limits with time until reset. Bars are blue, turn amber past 70% and red past 90%. |
-| **[lenadweb-image-preview](plugins/lenadweb-image-preview)** | When the clipboard holds an image, shows its preview above the prompt with its size and format. After you paste, each `[Image #N]` in the draft gets a thumbnail until you send the prompt. **↗ Open** opens the image in Preview. Previews size themselves to the terminal. Ghostty and kitty get the real pixels; other terminals, Terminal.app included, get block characters picked per cell from quadrants, halves and eighths. If [chafa](https://hpjansson.org/chafa/) is installed, it draws them instead. |
+| **[lenadweb-image-preview](plugins/lenadweb-image-preview)** | When the clipboard holds an image, shows its preview above the prompt with its size and format. After you paste, each `[Image #N]` in the draft gets a thumbnail until you send the prompt. **↗ Open** opens the image in Preview. Previews size themselves to the terminal. Images are drawn with block characters picked per cell from quadrants, halves and eighths, so they work in every terminal; in Ghostty or kitty, the **Real pixels** setting draws the actual image. |
 
 ### lenadweb-usage-meter
 
@@ -32,7 +32,7 @@ Then run `/reload-plugins` in an open session, or restart Claude Code.
 ## Notes
 
 - **lenadweb-usage-meter**: session and weekly limits appear after the first reply of a session (Claude Code learns them from API responses) and only on a Pro or Max subscription. The context bar is there from the start.
-- **lenadweb-image-preview**: macOS only (reads the clipboard with `osascript` and scales with `sips`, both built in). With the band above the prompt focused (click it, or ctrl+x tab): `o` opens the clipboard image, `1`–`9` open a pasted one, `h` hides the preview until the clipboard changes.
+- **lenadweb-image-preview**: macOS only (reads the clipboard with `osascript` and scales with `sips`, both built in); sends nothing over the network. With the band above the prompt focused (click it, or ctrl+x tab): `o` opens the clipboard image, `1`–`9` open a pasted one, `h` hides the preview until the clipboard changes.
 
 ## Develop
 

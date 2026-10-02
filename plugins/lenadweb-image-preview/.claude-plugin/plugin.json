@@ -19,5 +19,13 @@
     "terminal",
     "mod"
   ],
+  "userConfig": {
+    "pixel_images": {
+      "type": "boolean",
+      "title": "Real pixels (Ghostty, kitty)",
+      "description": "Draw images with real pixels through the kitty graphics protocol. Turn on only in Ghostty or kitty; other terminals show block characters.",
+      "default": false
+    }
+  },
   "types": "./types/index.d.ts"
 }

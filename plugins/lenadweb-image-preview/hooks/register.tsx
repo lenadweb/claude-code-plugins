@@ -5,28 +5,23 @@ import type { Picture } from '../types'
 import { base64ToBytes } from './base64'
 import { decodeBmp } from './bmp'
 import { renderClipboardCard, renderThumbnails } from './cards'
-import { chafaArgs, chafaOutputToCells } from './chafa'
 import { imageNumbersIn, mentionsImage } from './draft'
 import { SAMPLES_ACROSS, SAMPLES_DOWN } from './glyphs'
-import { CHECK_PASTEBOARD_ARGS, parsePasteboardState, parseSavedImage, savePasteboardArgs } from './pasteboard'
+import { parsePasteboardState, parseSavedImage, PASTEBOARD_SCRIPT } from './pasteboard'
 import { pixelsToCells } from './raster'
 import { DEFAULT_BAND, fitImage, isSameSize, previewArea, thumbnailArea } from './sizing'
 import type { CellBox } from './sizing'
-import { canShowPixels, hasTrueColor } from './terminal'
 
 const clipboardAtom = atom({ plugin: 'lenadweb-image-preview', key: 'clipboard' } as const, null)
 const hiddenChangeCountAtom = atom({ plugin: 'lenadweb-image-preview', key: 'hiddenChangeCount' } as const, -1)
 const thumbnailsAtom = atom({ plugin: 'lenadweb-image-preview', key: 'thumbnails' } as const, {})
 
 const POLL_INTERVAL_MS = 1500
-const TEMP_DIR_PREFIX = 'claude-image-preview'
-const TOOL_PATH = '/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin'
+const TEMP_DIR_NAME = 'claude-image-preview'
 
 const session = {
   workDir: '',
   showsPixels: false,
-  hasTrueColor: false,
-  chafaPath: '',
   band: DEFAULT_BAND,
   lastChangeCount: -1,
   clipboardImage: null as Picture | null,
@@ -34,33 +29,11 @@ const session = {
   isResizing: false,
 }
 
-async function detectTerminal($: EngineInterface): Promise<void> {
-  const env = {
-    program: await $.env.get('TERM_PROGRAM'),
-    term: await $.env.get('TERM'),
-    colorTerm: await $.env.get('COLORTERM'),
-    kittyWindowId: await $.env.get('KITTY_WINDOW_ID'),
-  }
-  session.showsPixels = canShowPixels(env)
-  session.hasTrueColor = hasTrueColor(env)
-
-  const which = await $.process.run(['/usr/bin/which', 'chafa'], { env: { PATH: TOOL_PATH } })
-  session.chafaPath = which.exitCode === 0 ? which.stdout.trim() : ''
-}
-
 async function drawPicture($: EngineInterface, image: Picture, area: CellBox): Promise<Picture | null> {
   const size = fitImage(image.width, image.height, area)
   const sized: Picture = { ...image, ...size, cells: '' }
   if (session.showsPixels) {
     return sized
-  }
-
-  if (session.chafaPath) {
-    const chafa = await $.process.run(chafaArgs(session.chafaPath, image.file, size, session.hasTrueColor))
-    const cells = chafa.exitCode === 0 ? chafaOutputToCells(chafa.stdout, size) : null
-    if (cells) {
-      return { ...sized, cells }
-    }
   }
 
   const bmpFile = `${session.workDir}/clip-${image.changeCount}-${size.columns}x${size.rows}.bmp`
@@ -77,7 +50,7 @@ async function drawPicture($: EngineInterface, image: Picture, area: CellBox): P
 }
 
 async function readClipboard($: EngineInterface): Promise<void> {
-  const check = await $.process.run(CHECK_PASTEBOARD_ARGS)
+  const check = await $.process.run(['osascript', '-l', 'JavaScript', '-e', PASTEBOARD_SCRIPT, 'check'])
   const pasteboard = parsePasteboardState(check.stdout)
   if (!pasteboard || pasteboard.changeCount === session.lastChangeCount) {
     return
@@ -92,7 +65,7 @@ async function readClipboard($: EngineInterface): Promise<void> {
 
   const rawFile = `${session.workDir}/clip-${pasteboard.changeCount}.raw`
   const pngFile = `${session.workDir}/clip-${pasteboard.changeCount}.png`
-  const save = await $.process.run(savePasteboardArgs(rawFile))
+  const save = await $.process.run(['osascript', '-l', 'JavaScript', '-e', PASTEBOARD_SCRIPT, 'save', rawFile])
   const saved = parseSavedImage(save.stdout)
   const converted = await $.process.run(['sips', '-s', 'format', 'png', rawFile, '--out', pngFile])
   if (!saved || converted.exitCode !== 0) {
@@ -182,20 +155,21 @@ async function openInViewer($: EngineInterface, picture: Picture): Promise<void>
 }
 
 async function removeTempFiles($: EngineInterface): Promise<void> {
-  if (!session.workDir.includes(TEMP_DIR_PREFIX)) {
+  if (!session.workDir.includes(TEMP_DIR_NAME)) {
     return
   }
   await $.process.run(['rm', '-rf', session.workDir])
   session.workDir = ''
 }
 
-export const register: Register = on => {
+export const register: Register = (on, options) => {
+  session.showsPixels = options.pixel_images === true
+
   on('session.start', async ($, e, next) => {
     const result = await next(e)
 
-    const tempDir = await $.process.run(['mktemp', '-d', '-t', TEMP_DIR_PREFIX])
+    const tempDir = await $.process.run(['mktemp', '-d', '-t', 'claude-image-preview'])
     session.workDir = tempDir.stdout.trim()
-    await detectTerminal($)
     await poll($)
 
     $.clock.every(POLL_INTERVAL_MS, () => {

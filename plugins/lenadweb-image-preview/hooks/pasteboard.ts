@@ -1,4 +1,4 @@
-const PASTEBOARD_SCRIPT = `ObjC.import('AppKit')
+export const PASTEBOARD_SCRIPT = `ObjC.import('AppKit')
 function run(argv) {
   const pasteboard = $.NSPasteboard.generalPasteboard
   const types = ObjC.deepUnwrap(pasteboard.types) || []
@@ -25,12 +25,6 @@ export type SavedImage = {
   format: string
   width: number
   height: number
-}
-
-export const CHECK_PASTEBOARD_ARGS = ['osascript', '-l', 'JavaScript', '-e', PASTEBOARD_SCRIPT, 'check']
-
-export function savePasteboardArgs(path: string): string[] {
-  return ['osascript', '-l', 'JavaScript', '-e', PASTEBOARD_SCRIPT, 'save', path]
 }
 
 export function parsePasteboardState(output: string): PasteboardState | null {

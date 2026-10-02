@@ -27,7 +27,7 @@ export function pixelsToCells(pixels: Pixels): RasterCells {
   return { columns, rows, cells: encodeCells(words) }
 }
 
-export function encodeCells(words: Uint32Array): string {
+function encodeCells(words: Uint32Array): string {
   return bytesToBase64(new Uint8Array(words.buffer, words.byteOffset, words.byteLength))
 }
 

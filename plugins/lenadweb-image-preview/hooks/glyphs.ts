@@ -3,7 +3,7 @@ import type { Rgb } from './color'
 export const SAMPLES_ACROSS = 4
 export const SAMPLES_DOWN = 8
 export const SAMPLES_PER_CELL = SAMPLES_ACROSS * SAMPLES_DOWN
-export const FULL_BLOCK = 0x2588
+const FULL_BLOCK = 0x2588
 
 export type CellMatch = {
   glyph: number
